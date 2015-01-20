@@ -1,0 +1,26 @@
+{
+  "name": "event-infinite-scroll",
+  "version": "0.0.1",
+  "authors": [
+    "chadliu23 <chadliu23@gmail.com>"
+  ],
+  "description": "Infinite scroll. when reach bottom or top it will raise event",
+  "keywords": [
+    "Polymer",
+    "infinite",
+    "scroll",
+    "web-components"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/chadliu23/infinite-scroll",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~0.5.2"
+  }
+}

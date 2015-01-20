@@ -1,0 +1,70 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Element providing infinite scroll to track the parentNode on reaching bottom and end.
+It will raise event when it reaches. 
+##### Example
+
+    <event-infinite-scroll url="/upload" on-success="{{handleResponse}}"></event-infinite-scroll>
+
+@element event-infinite-scroll
+@blurb Element providing infinite scroll to track the parentNode on reaching bottom and end.
+@status alpha
+@homepage http://chadliu23.github.io/event-infinite-scroll
+-->
+<polymer-element name="event-infinite-scroll" attributes="scrollDenominator">
+
+<template></template>
+<script>
+	Polymer('event-infinite-scroll', {
+		/**
+       	 * Fired when reach bottom.
+       	 *
+         * @event reach-bottom
+         */
+
+        /**
+       	 * Fired when reach top.
+       	 *
+         * @event reach-top
+         */
+
+        /**
+       	 * When you want to notification
+       	 *
+         * @int scrollDenominator
+         */
+        scrollDenominator: 1, 
+
+
+		ready:function (){
+			this.parentNode.addEventListener("scroll", function() {
+      			this.scrolled();
+    		}.bind( this ));
+		}, 
+		scrolled: function(){
+		    if(this._isReachBottom()){
+		    	this.fire("reach-bottom", "");
+		    }
+			if(this._isReachTop()){
+			   	this.fire("reach-top", "");
+			   	this.fire("reach-top", "");
+			   	this.fire("reach-top", "");
+			   	this.fire("reach-top", "");
+			   	this.fire("reach-top", "");
+			   	this.fire("reach-top", "");
+			}
+		},
+		_isReachTop: function(){
+			console.log(( this.parentNode.scrollTop < this.parentNode.clientHeight ));
+			return ( this.parentNode.scrollTop < this.parentNode.clientHeight );
+		},
+		_isReachBottom: function(){
+			var scrollBottom = this.parentNode.scrollTop + this.parentNode.clientHeight;
+		    var belowView = this.parentNode.scrollHeight - scrollBottom;
+		    return ( belowView < this.parentNode.clientHeight);
+		}
+	});
+</script>
+
+</polymer-element>

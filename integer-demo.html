@@ -1,0 +1,53 @@
+
+  <link rel="import" href="event-infinite-scroll.html">
+
+<polymer-element name="integer-demo">
+  <template>
+  <style>
+    .sizedFrame {
+      overflow-y: auto;
+      height: 300px;
+    }
+  </style>
+    <div id="scrollDown" class="sizedFrame">
+      <template repeat="{{h in helloDown}}">
+        <p>{{h}}</p>
+      </template>
+      <event-infinite-scroll on-reach-bottom="{{reachedBottom}}" >
+      </event-infinite-scroll>
+    </div>
+    {{counter}}
+    <div id="scrollUp" class="sizedFrame">
+      <template repeat="{{h in helloUp}}">
+        <p>{{h}}</p>
+      </template>
+      <event-infinite-scroll on-reach-top="{{reachedTop}}" >
+      </event-infinite-scroll>
+    </div>
+    {{negCounter}}
+  </template>
+  <script>
+  Polymer({
+    helloDown:[], 
+    helloUp:[],
+    counter: 0,
+    negCounter: -1,
+    ready:function(){
+      for (var i = 10; i >= 0; i--) {
+        this.helloDown.push(this.counter++);
+        this.helloUp.splice(0, 0, this.negCounter--);
+      };
+      
+    }, 
+    domReady:function(){
+      this.$.scrollUp.scrollTop = this.$.scrollUp.scrollHeight;
+    },
+    reachedBottom: function(event){
+      this.helloDown.push(this.counter++);
+    },
+    reachedTop: function(event) {
+      this.helloUp.splice(0, 0, this.negCounter--);
+    }
+  });
+  </script>
+</polymer-element>
