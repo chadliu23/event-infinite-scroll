@@ -12,7 +12,7 @@ It will raise event when it reaches.
 @status alpha
 @homepage http://chadliu23.github.io/event-infinite-scroll
 -->
-<polymer-element name="event-infinite-scroll" attributes="scrollDenominator">
+<polymer-element name="event-infinite-scroll" attributes="readyOnStart scrollDenominator loadingDelay">
 
 <template></template>
 <script>
@@ -38,7 +38,27 @@ It will raise event when it reaches.
         observerStatus: true, 
         observer: null,
 
+        /**
+       	 * You can set your item loading delay time when scroll up infinite
+       	 *
+         * @int loadingDelay
+         */
+        loadingDelay: 1,
+
+        /**
+       	 * track scroll on ready 
+       	 * otherwise you can call startObserve when ever you want
+       	 *
+         * @boolean readyOnStart
+         */
+        readyOnStart: true,
+
 		ready:function (){
+			if (this.readyOnStart){
+				this.startObserve();
+			}
+		}, 
+		startObserve: function(){
 			this.parentNode.addEventListener("scroll", function() {
       			this.scrolled();
     		}.bind( this ));
@@ -58,7 +78,7 @@ It will raise event when it reaches.
 		      subtree: true, 
 		      characterData: true
 		    });
-		}, 
+		},
 		scrolled: function(){
 		    if(this._isReachBottom()){
 		    	this.fire("reach-bottom", "");
@@ -69,16 +89,16 @@ It will raise event when it reaches.
 			   	this.fire("reach-top", "");
 			   	setTimeout(function (){
 			        self.parentNode.scrollTop += self.parentNode.scrollHeight - oldheight;
-			    }, 1);
+			    }, this.loadingDelay);
 			}
 		},
 		_isReachTop: function(){
-			return ( this.parentNode.scrollTop < this.parentNode.clientHeight );
+			return ( this.parentNode.scrollTop < this.parentNode.clientHeight/this.scrollDenominator );
 		},
 		_isReachBottom: function(){
 			var scrollBottom = this.parentNode.scrollTop + this.parentNode.clientHeight;
 		    var belowView = this.parentNode.scrollHeight - scrollBottom;
-		    return ( belowView < this.parentNode.clientHeight);
+		    return ( belowView < this.parentNode.clientHeight/this.scrollDenominator);
 		}
 	});
 </script>
