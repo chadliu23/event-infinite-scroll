@@ -9,6 +9,8 @@
       height: 300px;
     }
   </style>
+    <h1>Scroll down </h1> 
+    <p> Last Number: {{counter}}</p>
     <div id="scrollDown" class="sizedFrame">
       <template repeat="{{h in helloDown}}">
         <p>{{h}}</p>
@@ -16,7 +18,8 @@
       <event-infinite-scroll on-reach-bottom="{{reachedBottom}}" >
       </event-infinite-scroll>
     </div>
-    {{counter}}
+    <h1>Scroll Up</h1> 
+    <p> Last Number: {{negCounter}}</p>
     <div id="scrollUp" class="sizedFrame">
       <template repeat="{{h in helloUp}}">
         <p>{{h}}</p>
@@ -24,7 +27,6 @@
       <event-infinite-scroll on-reach-top="{{reachedTop}}" >
       </event-infinite-scroll>
     </div>
-    {{negCounter}}
   </template>
   <script>
   Polymer({

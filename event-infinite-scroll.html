@@ -35,28 +35,44 @@ It will raise event when it reaches.
          * @int scrollDenominator
          */
         scrollDenominator: 1, 
-
+        observerStatus: true, 
+        observer: null,
 
 		ready:function (){
 			this.parentNode.addEventListener("scroll", function() {
       			this.scrolled();
     		}.bind( this ));
+    		var self = this;
+    		this.observer = new MutationObserver( function() {
+		      window.setTimeout( function() {
+		        if (!self.observerStatus){
+		          this.observer.disconnect();
+		          return;
+		        }
+		        this.scrolled();
+
+		      }.bind( this ), 10 );
+		    }.bind( this ));
+		    this.observer.observe( this.parentNode, {
+		      childList: true, 
+		      subtree: true, 
+		      characterData: true
+		    });
 		}, 
 		scrolled: function(){
 		    if(this._isReachBottom()){
 		    	this.fire("reach-bottom", "");
 		    }
 			if(this._isReachTop()){
+				var oldheight = this.parentNode.scrollHeight;
+      			var self = this;
 			   	this.fire("reach-top", "");
-			   	this.fire("reach-top", "");
-			   	this.fire("reach-top", "");
-			   	this.fire("reach-top", "");
-			   	this.fire("reach-top", "");
-			   	this.fire("reach-top", "");
+			   	setTimeout(function (){
+			        self.parentNode.scrollTop += self.parentNode.scrollHeight - oldheight;
+			    }, 1);
 			}
 		},
 		_isReachTop: function(){
-			console.log(( this.parentNode.scrollTop < this.parentNode.clientHeight ));
 			return ( this.parentNode.scrollTop < this.parentNode.clientHeight );
 		},
 		_isReachBottom: function(){
