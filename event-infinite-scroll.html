@@ -62,6 +62,9 @@ It will raise event when it reaches.
 			this.parentNode.addEventListener("scroll", function() {
       			this.scrolled();
     		}.bind( this ));
+			this.parentNode.addEventListener("mousewheel", function() {
+				this.scrolledWheel();
+			}.bind( this ));
     		var self = this;
     		this.observer = new MutationObserver( function() {
 		      window.setTimeout( function() {
@@ -78,6 +81,11 @@ It will raise event when it reaches.
 		      subtree: true, 
 		      characterData: true
 		    });
+		},
+		scrolledWheel: function(){
+			if (this.parentNode.scrollHeight == this.parentNode.clientHeight){
+				this.scrolled();
+			}
 		},
 		scrolled: function(){
 		    if(this._isReachBottom()){
