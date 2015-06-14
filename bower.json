@@ -1,6 +1,6 @@
 {
   "name": "event-infinite-scroll",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "authors": [
     "chadliu23 <chadliu23@gmail.com>"
   ],
@@ -21,6 +21,6 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~0.5.2"
+    "polymer": "#^1.0.0"
   }
 }
