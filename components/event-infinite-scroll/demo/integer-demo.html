@@ -1,0 +1,76 @@
+<link rel="import" href="../event-infinite-scroll.html">
+
+<dom-module id="integer-demo">
+    <template>
+        <style>
+            .sizedFrame {
+                overflow-y: auto;
+                height: 250px;
+            }
+        </style>
+        <h1>Scroll down </h1>
+
+        <p> Last Number: <span>{{counter}}</span></p>
+
+        <div id="scrollUp" class="sizedFrame">
+            <template is="dom-repeat" items="{{helloDown}}">
+                <p>{{item}}</p>
+            </template>
+            <event-infinite-scroll ready-on-start on-reach-bottom="reachedBottom">
+            </event-infinite-scroll>
+        </div>
+        <h1>Scroll Up</h1>
+
+        <p> Last Number: <span>{{negCounter}}</span></p>
+
+        <div id="scrollDown" class="sizedFrame">
+            <template is="dom-repeat" items="{{helloUp}}">
+                <p>{{item}}</p>
+            </template>
+            <event-infinite-scroll on-reach-top="reachedTop">
+            </event-infinite-scroll>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: "integer-demo",
+            properties: {
+                helloDown: {
+                    type: Array,
+                    value: []
+                },
+                helloUp: {
+                    type: Array,
+                    value: []
+                },
+                counter: {
+                    type: Number,
+                    value: 0
+                },
+                negCounter: {
+                    type: Number,
+                    value: -1
+                }
+            },
+
+
+            ready: function () {
+                for (var i = 0; i < 20; i++) {
+                    this.push('helloDown', this.counter++);
+                }
+                for (var i = 0; i < 10; i++) {
+                    this.splice('helloUp', 0, 0, this.negCounter--);
+                }
+                this.$.scrollUp.scrollTop = 0;
+                this.$.scrollDown.scrollTop = this.$.scrollDown.scrollHeight;
+            },
+
+            reachedBottom: function (event) {
+                this.push('helloDown', this.counter++);
+            },
+            reachedTop: function (event) {
+                this.splice('helloUp', 0, 0, this.negCounter--);
+            }
+        });
+    </script>
+</dom-module>

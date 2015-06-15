@@ -1,0 +1,129 @@
+<!--
+Element providing infinite scroll to track the parentNode on reaching bottom and end.
+It will raise event when it reaches. 
+##### Example
+
+    <event-infinite-scroll  on-reach-bottom="{{reachBottom}}" on-reach-top="{{reachTop}}"></event-infinite-scroll>
+
+@element event-infinite-scroll
+@blurb Element providing infinite scroll to track the parentNode on reaching bottom and end.
+@status alpha
+@homepage http://chadliu23.github.io/event-infinite-scroll
+@demo demo/index.html
+-->
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="event-infinite-scroll">
+
+    <template></template>
+    <script>
+        Polymer({
+            is: "event-infinite-scroll",
+            /**
+             * Fired when reach bottom.
+             *
+             * @event reach-bottom
+             */
+
+            /**
+             * Fired when reach top.
+             *
+             * @event reach-top
+             */
+
+            properties: {
+                /**
+                 * track scroll on ready
+                 * otherwise you can call startObserve when ever you want
+                 *
+                 * @boolean readyOnStart
+                 */
+                readyOnStart: {
+                    type: Boolean,
+                    value: true
+                },
+
+                /**
+                 * When you want to notification
+                 *
+                 * @int scrollDenominator
+                 */
+                scrollDenominator: {
+                    type: Number,
+                    value: 1
+                },
+
+                /**
+                 * You can set your item loading delay time when scroll up infinite
+                 *
+                 * @int loadingDelay
+                 */
+                loadingDelay: {
+                    type: Number,
+                    value: 1
+                }
+            },
+
+            observerStatus: true,
+            observer: null,
+
+            loadingDelay: 1,
+
+            ready: function () {
+                if (this.readyOnStart) {
+                    this.startObserve();
+                }
+            },
+            startObserve: function () {
+                this.parentNode.addEventListener("scroll", function () {
+                    this.scrolled();
+                }.bind(this));
+                this.parentNode.addEventListener("mousewheel", function () {
+                    this.scrolledWheel();
+                }.bind(this));
+                var self = this;
+                this.observer = new MutationObserver(function () {
+                    window.setTimeout(function () {
+                        if (!self.observerStatus) {
+                            this.observer.disconnect();
+                            return;
+                        }
+                        this.scrolled();
+
+                    }.bind(this), 10);
+                }.bind(this));
+                this.observer.observe(this.parentNode, {
+                    childList: true,
+                    subtree: true,
+                    characterData: true
+                });
+            },
+            scrolledWheel: function () {
+                if (this.parentNode.scrollHeight == this.parentNode.clientHeight) {
+                    this.scrolled();
+                }
+            },
+            scrolled: function () {
+                if (this._isReachBottom()) {
+                    this.fire("reach-bottom", "");
+                }
+                if (this._isReachTop()) {
+                    var oldheight = this.parentNode.scrollHeight;
+                    var self = this;
+                    this.fire("reach-top", "");
+                    setTimeout(function () {
+                        self.parentNode.scrollTop += self.parentNode.scrollHeight - oldheight;
+                    }, this.loadingDelay);
+                }
+            },
+            _isReachTop: function () {
+                return ( this.parentNode.scrollTop < this.parentNode.clientHeight / this.scrollDenominator );
+            },
+            _isReachBottom: function () {
+                var scrollBottom = this.parentNode.scrollTop + this.parentNode.clientHeight;
+                var belowView = this.parentNode.scrollHeight - scrollBottom;
+                return ( belowView < this.parentNode.clientHeight / this.scrollDenominator);
+            }
+        });
+    </script>
+
+</dom-module>
