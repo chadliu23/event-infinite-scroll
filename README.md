@@ -1,5 +1,4 @@
 #event-infinite-scroll
-====
 
 This is a Polymer component. This element will fire events when the page is scrolled to the top and bottom.
 
