@@ -1,9 +1,15 @@
 <!--
 Element providing infinite scroll to track the parentNode on reaching bottom and end.
-It will raise event when it reaches. 
+It will raise event when it reaches.
 ##### Example
 
-    <event-infinite-scroll  on-reach-bottom="{{reachBottom}}" on-reach-top="{{reachTop}}"></event-infinite-scroll>
+    <event-infinite-scroll
+        auto-start
+        scroll-offset="500"
+        loading-delay="1000"
+        on-reach-bottom="{{reachBottom}}"
+        on-reach-top="{{reachTop}}">
+    </event-infinite-scroll>
 
 @element event-infinite-scroll
 @blurb Element providing infinite scroll to track the parentNode on reaching bottom and end.
@@ -16,114 +22,132 @@ It will raise event when it reaches.
 
     <template></template>
     <script>
-        Polymer({
-            is: "event-infinite-scroll",
+    Polymer({
+        is: "event-infinite-scroll",
+        /**
+         * Fired when reach bottom.
+         *
+         * @event reach-bottom
+         */
+
+        /**
+         * Fired when reach top.
+         *
+         * @event reach-top
+         */
+
+        properties: {
             /**
-             * Fired when reach bottom.
+             * track scroll on ready
+             * otherwise you can call observer when ever you want
              *
-             * @event reach-bottom
+             * @boolean autoStart
              */
+            autoStart: {
+                type: Boolean,
+                value: false,
+                observer: '_startScroll'
+            },
 
             /**
-             * Fired when reach top.
+             * The offset is used for triggering the notifications
+             * before the real top/bottom is reached
              *
-             * @event reach-top
+             * @int scrollOffset
              */
-
-            properties: {
-                /**
-                 * track scroll on ready
-                 * otherwise you can call startObserve when ever you want
-                 *
-                 * @boolean readyOnStart
-                 */
-                readyOnStart: {
-                    type: Boolean,
-                    value: true
-                },
-
-                /**
-                 * When you want to notification
-                 *
-                 * @int scrollDenominator
-                 */
-                scrollDenominator: {
-                    type: Number,
-                    value: 1
-                },
-
-                /**
-                 * You can set your item loading delay time when scroll up infinite
-                 *
-                 * @int loadingDelay
-                 */
-                loadingDelay: {
-                    type: Number,
-                    value: 1
-                }
+            scrollOffset: {
+                type: Number,
+                value: 200,
+                reflectToAttribute: true
             },
 
-            observerStatus: true,
-            observer: null,
-
-            loadingDelay: 1,
-
-            ready: function () {
-                if (this.readyOnStart) {
-                    this.startObserve();
-                }
-            },
-            startObserve: function () {
-                this.parentNode.addEventListener("scroll", function () {
-                    this.scrolled();
-                }.bind(this));
-                this.parentNode.addEventListener("mousewheel", function () {
-                    this.scrolledWheel();
-                }.bind(this));
-                var self = this;
-                this.observer = new MutationObserver(function () {
-                    window.setTimeout(function () {
-                        if (!self.observerStatus) {
-                            this.observer.disconnect();
-                            return;
-                        }
-                        this.scrolled();
-
-                    }.bind(this), 10);
-                }.bind(this));
-                this.observer.observe(this.parentNode, {
-                    childList: true,
-                    subtree: true,
-                    characterData: true
-                });
-            },
-            scrolledWheel: function () {
-                if (this.parentNode.scrollHeight == this.parentNode.clientHeight) {
-                    this.scrolled();
-                }
-            },
-            scrolled: function () {
-                if (this._isReachBottom()) {
-                    this.fire("reach-bottom", "");
-                }
-                if (this._isReachTop()) {
-                    var oldheight = this.parentNode.scrollHeight;
-                    var self = this;
-                    this.fire("reach-top", "");
-                    setTimeout(function () {
-                        self.parentNode.scrollTop += self.parentNode.scrollHeight - oldheight;
-                    }, this.loadingDelay);
-                }
-            },
-            _isReachTop: function () {
-                return ( this.parentNode.scrollTop < this.parentNode.clientHeight / this.scrollDenominator );
-            },
-            _isReachBottom: function () {
-                var scrollBottom = this.parentNode.scrollTop + this.parentNode.clientHeight;
-                var belowView = this.parentNode.scrollHeight - scrollBottom;
-                return ( belowView < this.parentNode.clientHeight / this.scrollDenominator);
+            /**
+             * You can set your item loading delay time when scroll infinite
+             *
+             * @int loadingDelay (in milliseconds)
+             */
+            loadingDelay: {
+                type: Number,
+                value: 0,
+                reflectToAttribute: true
             }
-        });
+        },
+
+        observerStatus: true,
+        observer: null,
+
+        /**
+         * Triggered when the autoStart status is changed
+         *
+         * @readyOnStart [boolean] autoStart
+         */
+        _startScroll: function( newValue ) {
+            if ( newValue ) {
+                this.startObserve();
+            }
+        },
+
+        startObserve: function () {
+            this.parentNode.addEventListener( "scroll", function () {
+                this.scrolled();
+            }.bind( this ) );
+
+            this.parentNode.addEventListener( "mousewheel", function () {
+                this.scrolledWheel();
+            }.bind( this ) );
+
+            var self = this;
+
+            this.observer = new MutationObserver( function () {
+                window.setTimeout( function () {
+                    if ( ! self.observerStatus ) {
+                        this.observer.disconnect();
+                        return;
+                    }
+
+                    this.scrolled();
+                }.bind( this ), 10 );
+            }.bind( this ) );
+
+            this.observer.observe( this.parentNode, {
+                childList:     true,
+                subtree:       true,
+                characterData: true
+            });
+        },
+
+        scrolledWheel: function () {
+            if ( this.parentNode.scrollHeight == this.parentNode.clientHeight ) {
+                this.scrolled();
+            }
+        },
+
+        scrolled: function () {
+            if ( this._isReachBottom() ) {
+                // fire the reach-bottom after with delay if loadingDelay is set
+                this.async( function () {
+                    this.fire( "reach-bottom" );
+                }, this.loadingDelay );
+            }
+
+            else if ( this._isReachTop() ) {
+                // fire the reach-top after with delay if loadingDelay is set
+                this.async( function () {
+                    this.fire( "reach-top" );
+                }, this.loadingDelay );
+            }
+        },
+
+        _isReachTop: function () {
+            return ( this.parentNode.scrollTop <= this.scrollOffset );
+        },
+
+        _isReachBottom: function () {
+            var scrollBottom = this.parentNode.scrollTop + this.parentNode.clientHeight;
+            var belowView = this.parentNode.scrollHeight - scrollBottom;
+            return ( belowView <= this.scrollOffset );
+        }
+    });
     </script>
 
 </dom-module>
