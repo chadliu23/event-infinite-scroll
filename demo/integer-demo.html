@@ -16,7 +16,10 @@
             <template is="dom-repeat" items="{{helloDown}}">
                 <p>{{item}}</p>
             </template>
-            <event-infinite-scroll ready-on-start on-reach-bottom="reachedBottom">
+            <event-infinite-scroll
+                auto-start
+                scroll-offset="100"
+                on-reach-bottom="reachedBottom">
             </event-infinite-scroll>
         </div>
         <h1>Scroll Up</h1>
@@ -27,7 +30,11 @@
             <template is="dom-repeat" items="{{helloUp}}">
                 <p>{{item}}</p>
             </template>
-            <event-infinite-scroll on-reach-top="reachedTop">
+            <event-infinite-scroll
+                auto-start
+                scroll-offset="100"
+                loading-delay="1000"
+                on-reach-top="reachedTop">
             </event-infinite-scroll>
         </div>
     </template>
