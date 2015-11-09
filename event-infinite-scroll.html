@@ -116,6 +116,15 @@ It will raise event when it reaches.
             });
         },
 
+        stopObserve: function () {
+            this.parentNode.removeEventListener("scroll");
+            this.parentNode.removeEventListener("mousewheel");
+
+            if (this.observer) {
+                this.observer.disconnect();
+            }
+        },
+
         scrolledWheel: function () {
             if ( this.parentNode.scrollHeight == this.parentNode.clientHeight ) {
                 this.scrolled();
